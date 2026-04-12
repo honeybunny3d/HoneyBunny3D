@@ -207,7 +207,7 @@ function render(){
 function openAdd(){editId=null;filSels=[{name:'',matte:false}];pendingImg='';modal='form';render()}
 function openEdit(id){const p=pokemon.find(x=>x.id===id);editId=id;filSels=p.filaments.map(f=>({...f}));pendingImg=p.image||'';modal='form';render()}
 function del(id){if(confirm('Remove this figure?')){pokemon=pokemon.filter(p=>p.id!==id);render();}}
-function closeModal(){modal=null;filSels=[];pendingImg='';render();}
+function closeModal(){modal=null;filSels=[];pendingImg='';const el=document.getElementById('ml');if(el)el.remove();render();}
 function handleImg(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{pendingImg=ev.target.result;renderModal();};r.readAsDataURL(f);}
 function saveForm(){
   const name=document.getElementById('fn').value.trim();
@@ -216,7 +216,7 @@ function saveForm(){
   const fils=filSels.map((_,i)=>{const s=document.getElementById('fs'+i);const m=document.getElementById('fm'+i);return{name:s?s.value:'',matte:m?m.checked:false};}).filter(f=>f.name);
   if(editId){const i=pokemon.findIndex(p=>p.id===editId);pokemon[i]={...pokemon[i],name,rarity,filaments:fils,image:pendingImg};}
   else{pokemon.push({id:nextId++,name,rarity,filaments:fils,image:pendingImg});}
-  modal=null;filSels=[];pendingImg='';render();
+  modal=null;filSels=[];pendingImg='';const el=document.getElementById('ml');if(el)el.remove();render();
 }
 function addFil(){filSels.push({name:'',matte:false});renderModal()}
 function remFil(i){filSels.splice(i,1);renderModal()}
