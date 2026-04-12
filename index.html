@@ -30,7 +30,6 @@
   .card-img{width:64px;height:64px;border-radius:8px;background:#f0f0f0;border:1px solid #e8e8e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;text-align:center;overflow:hidden}
   .card-img img{width:100%;height:100%;object-fit:cover;border-radius:8px}
   .card-name{font-size:15px;font-weight:600;color:#1a1a1a}
-  .card-rarity{font-size:12px}
   .card-actions{margin-left:auto;display:flex;gap:4px;flex-shrink:0}
   .fil-section{margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px}
   .fil-title{font-size:11px;color:#999;margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase}
@@ -82,7 +81,6 @@ const FILAMENTS=[
   {name:'Red',hex:'#C12E1F'},{name:'Turquoise',hex:'#00B1B7'},{name:'Cyan',hex:'#0086D6'},{name:'Blue',hex:'#0A2989'},{name:'Cobalt Blue',hex:'#0056B8'},
   {name:'Purple',hex:'#5E43B7'},{name:'Indigo Purple',hex:'#482960'},{name:'Blue Grey',hex:'#5B6579'},{name:'Dark Gray',hex:'#545454'},{name:'Black',hex:'#000000'}
 ];
-const RARITIES=['Common','Uncommon','Rare','Ultra Rare','Legendary'];
 
 function norm(raw){
   if(!raw||raw.trim()==='N/A'||!raw.trim())return null;
@@ -94,7 +92,6 @@ function norm(raw){
   return{name:m?m.name:clean,matte:isMatte};
 }
 function getF(n){return FILAMENTS.find(f=>f.name===n)||{name:n,hex:'#aaa'}}
-function rc(r){return r==='Common'?'#888':r==='Uncommon'?'#1D9E75':r==='Rare'?'#378ADD':r==='Ultra Rare'?'#9B59B6':'#E84393'}
 
 const RAW=[
   ['Bulbasaur','Turquoise','Maroon Red','Black','Jade White'],
@@ -129,15 +126,16 @@ const RAW=[
 ];
 
 // All data stored in memory — works fine in Google Sites embed
-let pokemon=RAW.map((row,i)=>({id:i+1,name:row[0],rarity:'Common',image:'',filaments:row.slice(1).map(norm).filter(Boolean)}));
+const BAKED_IMAGES={"Porygon":"data:image/jpeg;base64,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"};
+let pokemon=RAW.map((row,i)=>({id:i+1,name:row[0],image:BAKED_IMAGES[row[0]]||'',filaments:row.slice(1).map(norm).filter(Boolean)}));
 let nextId=RAW.length+1;
-let tab='figures',modal=null,editId=null,filSels=[],filterRarity='',search='',pendingImg='';
+let tab='figures',modal=null,editId=null,filSels=[],search='',pendingImg='';
 
 function render(){
   const app=document.getElementById('app');
   const filtered=pokemon.filter(p=>{
     const s=search.toLowerCase();
-    return(!s||p.name.toLowerCase().includes(s))&&(!filterRarity||p.rarity===filterRarity);
+    return(!s||p.name.toLowerCase().includes(s));
   });
   const allFils=[...new Set(pokemon.flatMap(p=>p.filaments.map(f=>f.name)))];
   const matteCount=pokemon.flatMap(p=>p.filaments).filter(f=>f.matte).length;
@@ -172,10 +170,6 @@ function render(){
   </div>
   <div class="controls">
     <input type="text" placeholder="Search figures..." value="${search}" oninput="search=this.value;render()">
-    <select onchange="filterRarity=this.value;render()">
-      <option value="">All rarities</option>
-      ${RARITIES.map(r=>`<option value="${r}"${filterRarity===r?' selected':''}>${r}</option>`).join('')}
-    </select>
     <button class="btn btn-primary" onclick="openAdd()">+ Add figure</button>
   </div>`;
 
@@ -186,7 +180,7 @@ function render(){
       h+=`<div class="card">
         <div class="card-top">
           <div class="card-img">${p.image?`<img src="${p.image}" alt="${p.name}">`:'<span>No photo</span>'}</div>
-          <div style="flex:1;min-width:0"><div class="card-name">${p.name}</div><div class="card-rarity" style="color:${rc(p.rarity)}">${p.rarity}</div></div>
+          <div style="flex:1;min-width:0"><div class="card-name">${p.name}</div></div>
           <div class="card-actions">
             <button class="btn" style="height:28px;padding:0 10px;font-size:12px" onclick="openEdit(${p.id})">Edit</button>
             <button class="btn" style="height:28px;padding:0 10px;font-size:12px;color:#c0392b" onclick="del(${p.id})">✕</button>
@@ -233,11 +227,9 @@ function removeImg(){
 }
 function saveForm(){
   const nameEl=document.getElementById('fn');
-  const rarityEl=document.getElementById('fr');
-  if(!nameEl||!rarityEl)return;
+  if(!nameEl)return;
   const name=nameEl.value.trim();
   if(!name)return alert('Name required');
-  const rarity=rarityEl.value;
   const fils=filSels.map((_,i)=>{
     const s=document.getElementById('fs'+i);
     const m=document.getElementById('fm'+i);
@@ -245,9 +237,9 @@ function saveForm(){
   }).filter(f=>f.name);
   if(editId){
     const i=pokemon.findIndex(p=>p.id===editId);
-    if(i>-1)pokemon[i]={...pokemon[i],name,rarity,filaments:fils,image:pendingImg};
+    if(i>-1)pokemon[i]={...pokemon[i],name,filaments:fils,image:pendingImg};
   } else {
-    pokemon.push({id:nextId++,name,rarity,filaments:fils,image:pendingImg});
+    pokemon.push({id:nextId++,name,filaments:fils,image:pendingImg});
   }
   modal=null;filSels=[];pendingImg='';editId=null;
   const el=document.getElementById('ml');if(el)el.remove();
@@ -260,7 +252,7 @@ function upFilName(i,v){filSels[i].name=v;const d=document.getElementById('fd'+i
 
 function renderModal(){
   let el=document.getElementById('ml');if(el)el.remove();
-  const p=editId?pokemon.find(x=>x.id===editId):{name:'',rarity:'Common',filaments:[],image:''};
+  const p=editId?pokemon.find(x=>x.id===editId):{name:'',filaments:[],image:''};
   const div=document.createElement('div');div.className='modal-bg';div.id='ml';
   const img=pendingImg||(p.image||'');
   div.innerHTML=`<div class="modal" onclick="event.stopPropagation()">
@@ -270,7 +262,6 @@ function renderModal(){
       :`<label class="img-zone" id="img-zone"><input type="file" accept="image/*" style="display:none" onchange="handleImg(event)">📷 Tap to upload a photo of your figure</label>`
     }</div>
     <div class="field"><label>Name</label><input id="fn" value="${p.name}" placeholder="e.g. Mewtwo"></div>
-    <div class="field"><label>Rarity</label><select id="fr">${RARITIES.map(r=>`<option${r===p.rarity?' selected':''}>${r}</option>`).join('')}</select></div>
     <div class="field"><label>Filament colors</label>
       <div id="fl">${filSels.map((f,i)=>{const fd=f.name?getF(f.name):{hex:'#eee'};return`<div class="cs-row">
         <div class="cs-dot" id="fd${i}" style="background:${fd.hex}"></div>
