@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gachapop Gumdrop Pokédex</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,sans-serif;background:#f8f8f6;color:#1a1a1a;min-height:100vh}
+  .page{padding:1.5rem 1rem;max-width:980px;margin:0 auto}
+  h1{font-size:22px;font-weight:600;margin-bottom:4px;color:#1a1a1a}
+  .subtitle{font-size:14px;color:#666;margin-bottom:1.5rem}
+  .tabs{display:flex;gap:2px;margin-bottom:1.5rem;border-bottom:1px solid #e0e0e0}
+  .tab{padding:8px 16px;font-size:14px;cursor:pointer;color:#666;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none}
+  .tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem}
+  .stat{background:#fff;border-radius:8px;padding:12px 14px;border:1px solid #e8e8e8}
+  .stat-label{font-size:12px;color:#888;margin-bottom:4px}
+  .stat-value{font-size:22px;font-weight:600;color:#1a1a1a}
+  .controls{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+  .controls input,.controls select{flex:1;min-width:130px;height:36px;border-radius:8px;border:1px solid #ddd;padding:0 10px;font-size:14px;background:#fff;color:#1a1a1a}
+  .btn{height:36px;padding:0 14px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#1a1a1a;font-size:14px;cursor:pointer;white-space:nowrap}
+  .btn:hover{background:#f0f0f0}
+  .btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+  .btn-primary:hover{background:#333}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px;transition:border-color .15s}
+  .card:hover{border-color:#aaa}
+  .card-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .card-img{width:64px;height:64px;border-radius:8px;background:#f0f0f0;border:1px solid #e8e8e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;text-align:center;overflow:hidden}
+  .card-img img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+  .card-name{font-size:15px;font-weight:600;color:#1a1a1a}
+  .card-actions{margin-left:auto;display:flex;gap:4px;flex-shrink:0}
+  .fil-section{margin-top:8px;border-top:1px solid #f0f0f0;padding-top:8px}
+  .fil-title{font-size:11px;color:#999;margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase}
+  .filament-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .fil-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,0.12)}
+  .fil-name{font-size:12px;color:#1a1a1a;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fil-badge{font-size:10px;padding:1px 6px;border-radius:10px;background:#f3eeff;color:#7c4dbe;border:1px solid #e0d0f8;white-space:nowrap}
+  .fil-basic{font-size:10px;color:#999}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:1000}
+  .modal{background:#fff;border-radius:12px;border:1px solid #e0e0e0;padding:1.25rem;width:420px;max-width:96vw;max-height:90vh;overflow-y:auto}
+  .modal h2{font-size:18px;font-weight:600;margin-bottom:1rem}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:13px;color:#666;margin-bottom:4px}
+  .field input,.field select{width:100%;border-radius:8px;border:1px solid #ddd;padding:0 10px;font-size:14px;color:#1a1a1a;height:36px;background:#fff}
+  .modal-btns{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
+  .add-btn{width:100%;height:32px;border:1px dashed #ccc;border-radius:8px;background:none;color:#888;font-size:13px;cursor:pointer;margin-top:6px}
+  .add-btn:hover{background:#f8f8f8;color:#333}
+  .empty{text-align:center;padding:3rem 1rem;color:#999;font-size:14px}
+  .palette-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+  .swatch{border-radius:8px;overflow:hidden;border:1px solid #e8e8e8}
+  .swatch.used{border-color:#1a1a1a}
+  .swatch-color{height:52px}
+  .swatch-info{padding:5px 7px;background:#fff}
+  .swatch-name{font-size:10px;font-weight:600;color:#1a1a1a;line-height:1.3}
+  .swatch-hex{font-size:9px;color:#888;font-family:monospace}
+  .img-zone{border:1px dashed #ccc;border-radius:8px;padding:14px;text-align:center;cursor:pointer;font-size:13px;color:#888;margin-bottom:8px;display:block}
+  .img-zone:hover{background:#f8f8f8}
+  .img-preview{width:80px;height:80px;border-radius:8px;object-fit:cover;border:1px solid #e8e8e8;margin-bottom:8px}
+  .cs-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+  .cs-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,0.12)}
+  .cs-sel{flex:1;height:36px;border-radius:8px;border:1px solid #ddd;padding:0 8px;font-size:13px;background:#fff;color:#1a1a1a}
+  .cs-del{height:36px;width:32px;border-radius:8px;border:1px solid #ddd;background:none;cursor:pointer;color:#999;font-size:16px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="page" id="app"></div>
+<script>
+const FILAMENTS=[
+  {name:'Ivory White',hex:'#FFFFFF'},{name:'Bone White',hex:'#CBC6B8'},{name:'Desert Tan',hex:'#E8DBB7'},{name:'Latte Brown',hex:'#D3B7A7'},
+  {name:'Caramel',hex:'#AE835B'},{name:'Terracotta',hex:'#B15533'},{name:'Dark Brown',hex:'#7D6556'},{name:'Dark Chocolate',hex:'#4D3324'},
+  {name:'Lilac Purple',hex:'#AE96D4'},{name:'Sakura Pink',hex:'#E8AFCF'},{name:'Mandarin Orange',hex:'#F99963'},{name:'Lemon Yellow',hex:'#F7D959'},
+  {name:'Plum',hex:'#950051'},{name:'Scarlet Red',hex:'#DE4343'},{name:'Dark Red',hex:'#BB3D43'},{name:'Dark Green',hex:'#68724D'},
+  {name:'Grass Green',hex:'#61C680'},{name:'Apple Green',hex:'#C2E189'},{name:'Ice Blue',hex:'#A3D8E1'},{name:'Sky Blue',hex:'#56B7E6'},
+  {name:'Marine Blue',hex:'#0078BF'},{name:'Dark Blue',hex:'#042F56'},{name:'Ash Gray',hex:'#9B9EA0'},{name:'Nardo Gray',hex:'#757575'},
+  {name:'Jade White',hex:'#FFFFFF'},{name:'Beige',hex:'#F7E6DE'},{name:'Light Gray',hex:'#D1D3D5'},{name:'Silver',hex:'#A6A9AA'},{name:'Gray',hex:'#8E9089'},
+  {name:'Magenta',hex:'#EC008C'},{name:'Pink',hex:'#F55A74'},{name:'Hot Pink',hex:'#F5547C'},{name:'Orange',hex:'#FF6A13'},{name:'Pumpkin Orange',hex:'#FF9016'},
+  {name:'Gold',hex:'#E4BD68'},{name:'Sunflower Yellow',hex:'#FEC600'},{name:'Yellow',hex:'#F4EE2A'},{name:'Bright Green',hex:'#BECF00'},{name:'Bambu Green',hex:'#00AE42'},
+  {name:'Mistletoe Green',hex:'#3F8E43'},{name:'Bronze',hex:'#847D48'},{name:'Cocoa Brown',hex:'#6F5034'},{name:'Brown',hex:'#9D432C'},{name:'Maroon Red',hex:'#9D2235'},
+  {name:'Red',hex:'#C12E1F'},{name:'Turquoise',hex:'#00B1B7'},{name:'Cyan',hex:'#0086D6'},{name:'Blue',hex:'#0A2989'},{name:'Cobalt Blue',hex:'#0056B8'},
+  {name:'Purple',hex:'#5E43B7'},{name:'Indigo Purple',hex:'#482960'},{name:'Blue Grey',hex:'#5B6579'},{name:'Dark Gray',hex:'#545454'},{name:'Black',hex:'#000000'}
+];
+
+function norm(raw){
+  if(!raw||raw.trim()==='N/A'||!raw.trim())return null;
+  const s=raw.trim(),isMatte=s.toLowerCase().includes('matte');
+  let clean=s.replace(/\s*\(matte\)/i,'').trim();
+  const a={'Ashe Gray':'Ash Gray','Scarlett Red':'Scarlet Red','Liliac Purple':'Lilac Purple','Biege':'Beige','Grey':'Gray','White':'Jade White'};
+  if(a[clean])clean=a[clean];
+  const m=FILAMENTS.find(f=>f.name.toLowerCase()===clean.toLowerCase());
+  return{name:m?m.name:clean,matte:isMatte};
+}
+function getF(n){return FILAMENTS.find(f=>f.name===n)||{name:n,hex:'#aaa'}}
+
+const RAW=[
+  ['Bulbasaur','Turquoise','Maroon Red','Black','Jade White'],
+  ['Flareon','Orange','Sunflower Yellow','Black','Jade White'],
+  ['Jolteon','Sunflower Yellow','Black','Jade White',null],
+  ['Vaporeon','Turquoise','Cobalt Blue','Black','Jade White'],
+  ['Pikachu','Sunflower Yellow','Red','Black','Jade White'],
+  ['Charmander','Pumpkin Orange','Cyan','Black','Beige'],
+  ['Squirtle','Cyan','Cocoa Brown','Beige','Black'],
+  ['Eevee','Cocoa Brown','Beige','Black','Jade White'],
+  ['Meowth','Cocoa Brown','Beige','Black','Jade White'],
+  ['Jigglypuff','Sakura Pink (Matte)','Cobalt Blue','Black','Jade White'],
+  ['Mew','Sakura Pink (Matte)','Cobalt Blue','Black','Jade White'],
+  ['Mewtwo','Ashe Gray (Matte)','Lilac Purple (Matte)','Black','Jade White'],
+  ['Ditto','Liliac Purple (Matte)','Black',null,null],
+  ['Cubone','Pumpkin Orange','Gold','Black','Jade White'],
+  ['Psyduck','Sunflower Yellow','Desert Tan (Matte)','Black','Jade White'],
+  ['Magikarp','Orange','Sunflower Yellow','Black','Jade White'],
+  ['Gengar','Indigo Purple','Maroon Red','Black','Jade White'],
+  ['Togepi','Latte Brown (Matte)','Red','Black','Jade White'],
+  ['Snorlax','Blue','Beige','Black',null],
+  ['Lapras','Cyan','Desert Tan (Matte)','Gray','Black'],
+  ['Tangela','Cyan','Black','Jade White','Red'],
+  ['Drowzee','Sunflower Yellow','Cocoa Brown','Black','Jade White'],
+  ['Seel','Jade White','Pink','Black','Desert Tan (Matte)'],
+  ['Horsea','Turquoise','Black','Desert Tan (Matte)','Jade White'],
+  ['Porygon','Scarlet Red (Matte)','Turquoise','Black','Jade White'],
+  ['Slowpoke','Sakura Pink (Matte)','Desert Tan (Matte)','Black','Jade White'],
+  ['Oddish','Scarlet Red (Matte)','Cobalt Blue','Mistletoe Green',null],
+  ['Sandshrew','Gold','Cyan','Desert Tan (Matte)','Black'],
+  ['Diglett','Cocoa Brown','Pink','Black','Jade White'],
+];
+
+// All data stored in memory — works fine in Google Sites embed
+const BAKED_IMAGES={"Porygon":"data:image/jpeg;base64,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"};
+let pokemon=RAW.map((row,i)=>({id:i+1,name:row[0],image:BAKED_IMAGES[row[0]]||'',filaments:row.slice(1).map(norm).filter(Boolean)}));
+let nextId=RAW.length+1;
+let tab='figures',modal=null,editId=null,filSels=[],search='',pendingImg='';
+
+function render(){
+  const app=document.getElementById('app');
+  const filtered=pokemon.filter(p=>{
+    const s=search.toLowerCase();
+    return(!s||p.name.toLowerCase().includes(s));
+  });
+  const allFils=[...new Set(pokemon.flatMap(p=>p.filaments.map(f=>f.name)))];
+  const matteCount=pokemon.flatMap(p=>p.filaments).filter(f=>f.matte).length;
+
+  let h=`<h1>🎰 Gachapop Gumdrop Pokédex</h1>
+  <p class="subtitle">Mini figurine tracker — filament colors & reorder links</p>
+  <div class="tabs">
+    <button class="tab${tab==='figures'?' active':''}" onclick="tab='figures';render()">My Figures (${pokemon.length})</button>
+    <button class="tab${tab==='palette'?' active':''}" onclick="tab='palette';render()">Filament Palette</button>
+  </div>`;
+
+  if(tab==='palette'){
+    const inUse=new Set(pokemon.flatMap(p=>p.filaments.map(f=>f.name)));
+    h+=`<p style="font-size:14px;color:#666;margin-bottom:1rem">${FILAMENTS.length} colors in your palette · <b>${inUse.size} in use ✓</b></p><div class="palette-grid">`;
+    FILAMENTS.forEach(f=>{
+      const used=inUse.has(f.name);
+      h+=`<div class="swatch${used?' used':''}">
+        <div class="swatch-color" style="background:${f.hex};${f.hex==='#FFFFFF'?'border-bottom:1px solid #e8e8e8':''}"></div>
+        <div class="swatch-info"><div class="swatch-name">${f.name}${used?' ✓':''}</div><div class="swatch-hex">${f.hex}</div></div>
+      </div>`;
+    });
+    h+=`</div>`;
+    app.innerHTML=h;
+    if(modal)renderModal();
+    return;
+  }
+
+  h+=`<div class="stats">
+    <div class="stat"><div class="stat-label">Total figures</div><div class="stat-value">${pokemon.length}</div></div>
+    <div class="stat"><div class="stat-label">Unique filaments</div><div class="stat-value">${allFils.length}</div></div>
+    <div class="stat"><div class="stat-label">Matte uses</div><div class="stat-value">${matteCount}</div></div>
+  </div>
+  <div class="controls">
+    <input type="text" placeholder="Search figures..." value="${search}" oninput="search=this.value;render()">
+    <button class="btn btn-primary" onclick="openAdd()">+ Add figure</button>
+  </div>`;
+
+  if(!filtered.length){h+=`<div class="empty">No figures found.</div>`;}
+  else{
+    h+=`<div class="grid">`;
+    filtered.forEach(p=>{
+      h+=`<div class="card">
+        <div class="card-top">
+          <div class="card-img">${p.image?`<div style="width:100%;height:100%;background-image:url('${p.image}');background-size:cover;background-position:center;border-radius:8px"></div>`:'<span>No photo</span>'}</div>
+          <div style="flex:1;min-width:0"><div class="card-name">${p.name}</div></div>
+          <div class="card-actions">
+            <button class="btn" style="height:28px;padding:0 10px;font-size:12px" onclick="openEdit(${p.id})">Edit</button>
+            <button class="btn" style="height:28px;padding:0 10px;font-size:12px;color:#c0392b" onclick="del(${p.id})">✕</button>
+          </div>
+        </div>
+        <div class="fil-section">
+          <div class="fil-title">Filaments</div>
+          ${p.filaments.map(f=>{const fd=getF(f.name);return`<div class="filament-row"><div class="fil-dot" style="background:${fd.hex}"></div><span class="fil-name">${f.name}</span>${f.matte?`<span class="fil-badge">Matte</span>`:`<span class="fil-basic">PLA Basic</span>`}</div>`}).join('')}
+        </div>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+  app.innerHTML=h;
+  if(modal)renderModal();
+}
+
+function openAdd(){editId=null;filSels=[{name:'',matte:false}];pendingImg='';modal='form';render()}
+function openEdit(id){const p=pokemon.find(x=>x.id===id);editId=id;filSels=p.filaments.map(f=>({...f}));pendingImg=p.image||'';modal='form';render()}
+function del(id){if(confirm('Remove this figure?')){pokemon=pokemon.filter(p=>p.id!==id);render();}}
+function closeModal(){modal=null;filSels=[];pendingImg='';const el=document.getElementById('ml');if(el)el.remove();render();}
+function handleImg(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    pendingImg=ev.target.result;
+    // Swap preview in-place — don't re-render the whole modal
+    const zone=document.getElementById('img-zone');
+    if(zone){
+      zone.outerHTML=`<div id="img-preview-wrap" style="display:flex;align-items:center;gap:10px">
+        <img src="${pendingImg}" class="img-preview">
+        <button class="btn" style="font-size:12px;height:28px" type="button" onclick="removeImg()">Remove</button>
+      </div>`;
+    }
+  };
+  r.readAsDataURL(f);
+}
+function removeImg(){
+  pendingImg='';
+  const wrap=document.getElementById('img-preview-wrap');
+  if(wrap){
+    wrap.outerHTML=`<label class="img-zone" id="img-zone"><input type="file" accept="image/*" style="display:none" onchange="handleImg(event)">📷 Tap to upload a photo of your figure</label>`;
+  }
+}
+function saveForm(){
+  const nameEl=document.getElementById('fn');
+  if(!nameEl)return;
+  const name=nameEl.value.trim();
+  if(!name)return alert('Name required');
+  const fils=filSels.map((_,i)=>{
+    const s=document.getElementById('fs'+i);
+    const m=document.getElementById('fm'+i);
+    return{name:s?s.value:'',matte:m?m.checked:false};
+  }).filter(f=>f.name);
+  if(editId){
+    const i=pokemon.findIndex(p=>p.id===editId);
+    if(i>-1)pokemon[i]={...pokemon[i],name,filaments:fils,image:pendingImg};
+  } else {
+    pokemon.push({id:nextId++,name,filaments:fils,image:pendingImg});
+  }
+  modal=null;filSels=[];pendingImg='';editId=null;
+  const el=document.getElementById('ml');if(el)el.remove();
+  render();
+}
+function addFil(){filSels.push({name:'',matte:false});renderModal()}
+function remFil(i){filSels.splice(i,1);renderModal()}
+function upFilMatte(i,v){filSels[i].matte=v;}
+function upFilName(i,v){filSels[i].name=v;const d=document.getElementById('fd'+i);if(d)d.style.background=getF(v).hex;}
+
+function renderModal(){
+  let el=document.getElementById('ml');if(el)el.remove();
+  const p=editId?pokemon.find(x=>x.id===editId):{name:'',filaments:[],image:''};
+  const div=document.createElement('div');div.className='modal-bg';div.id='ml';
+  const img=pendingImg||(p.image||'');
+  div.innerHTML=`<div class="modal" onclick="event.stopPropagation()">
+    <h2>${editId?'Edit — '+p.name:'Add new figure'}</h2>
+    <div class="field"><label>Photo</label>${img
+      ?`<div id="img-preview-wrap" style="display:flex;align-items:center;gap:10px"><img src="${img}" class="img-preview"><button class="btn" style="font-size:12px;height:28px" type="button" onclick="removeImg()">Remove</button></div>`
+      :`<label class="img-zone" id="img-zone"><input type="file" accept="image/*" style="display:none" onchange="handleImg(event)">📷 Tap to upload a photo of your figure</label>`
+    }</div>
+    <div class="field"><label>Name</label><input id="fn" value="${p.name}" placeholder="e.g. Mewtwo"></div>
+    <div class="field"><label>Filament colors</label>
+      <div id="fl">${filSels.map((f,i)=>{const fd=f.name?getF(f.name):{hex:'#eee'};return`<div class="cs-row">
+        <div class="cs-dot" id="fd${i}" style="background:${fd.hex}"></div>
+        <select id="fs${i}" class="cs-sel" onchange="upFilName(${i},this.value)">
+          <option value="">— select color —</option>
+          ${FILAMENTS.map(fl=>`<option value="${fl.name}"${fl.name===f.name?' selected':''}>${fl.name}</option>`).join('')}
+        </select>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#666;white-space:nowrap">
+          <input type="checkbox" id="fm${i}"${f.matte?' checked':''} onchange="upFilMatte(${i},this.checked)"> Matte
+        </label>
+        <button class="cs-del" onclick="remFil(${i})">✕</button>
+      </div>`;}).join('')}</div>
+      <button class="add-btn" onclick="addFil()">+ Add filament</button>
+    </div>
+    <div class="modal-btns">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveForm()">${editId?'Save changes':'Add figure'}</button>
+    </div>
+  </div>`;
+  div.onclick=closeModal;
+  document.body.appendChild(div);
+}
+
+render();
+</script>
+</body>
+</html>
